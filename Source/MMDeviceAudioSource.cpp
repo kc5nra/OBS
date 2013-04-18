@@ -51,6 +51,7 @@ class MMDeviceAudioSource : public AudioSource
     List<float> inputBuffer;
     UINT inputBufferSize;
     QWORD firstTimestamp;
+    QWORD lastQPCTimestamp;
 
     bool bUseQPC;
 
@@ -243,8 +244,14 @@ bool MMDeviceAudioSource::Initialize(bool bMic, CTSTR lpID)
 
 void MMDeviceAudioSource::StartCapture()
 {
-    if(mmClient)
+    if(mmClient) {
         mmClient->Start();
+
+        /*UINT64 freq;
+        mmClock->GetFrequency(&freq);
+
+        Log(TEXT("frequency for device '%s' is %llu, samples per sec is %u"), GetDeviceName(), freq, this->GetSamplesPerSec());*/
+    }
 }
 
 void MMDeviceAudioSource::StopCapture()
@@ -261,6 +268,8 @@ QWORD MMDeviceAudioSource::GetTimestamp(QWORD qpcTimestamp)
     {
         newTimestamp = (bUseQPC) ? qpcTimestamp : App->GetAudioTime();
         newTimestamp += GetTimeOffset();
+
+        //Log(TEXT("got some mic audio, timestamp: %llu"), newTimestamp);
 
         return newTimestamp;
     }
@@ -311,12 +320,22 @@ QWORD MMDeviceAudioSource::GetTimestamp(QWORD qpcTimestamp)
         // timestamp smoothing
 
         QWORD difVal = GetQWDif(newTimestamp, lastUsedTimestamp);
-        if (difVal > 70)
+
+        //Log(TEXT("qpc timestamp: %llu, lastUsed: %llu, dif: %llu"), newTimestamp, lastUsedTimestamp, difVal);
+
+        if (difVal > 70) {
+            /*QWORD curTimeMS = App->GetVideoTime()-App->GetSceneTimestamp();
+            UINT curTimeTotalSec = (UINT)(curTimeMS/1000);
+            UINT curTimeTotalMin = curTimeTotalSec/60;
+            UINT curTimeHr  = curTimeTotalMin/60;
+            UINT curTimeMin = curTimeTotalMin-(curTimeHr*60);
+            UINT curTimeSec = curTimeTotalSec-(curTimeTotalMin*60);
+
+            Log(TEXT("A timestamp adjustment was encountered for device %s, approximate stream time is: %u:%u:%u, prev value: %llu, new value: %llu"), GetDeviceName(), curTimeHr, curTimeMin, curTimeSec, lastUsedTimestamp, newTimestamp);*/
             lastUsedTimestamp = newTimestamp;
+        }
 
-        //------------------------------------------------------
-
-        App->latestAudioTime = lastUsedTimestamp;
+        //Log(TEXT("got some desktop audio, timestamp: %llu"), lastUsedTimestamp);
 
         return lastUsedTimestamp;
     }
@@ -325,11 +344,16 @@ QWORD MMDeviceAudioSource::GetTimestamp(QWORD qpcTimestamp)
 bool MMDeviceAudioSource::GetNextBuffer(void **buffer, UINT *numFrames, QWORD *timestamp)
 {
     UINT captureSize = 0;
+    bool bFirstRun = true;
     HRESULT hRes;
-    
+
     while (true) {
-        if (inputBufferSize >= sampleWindowSize*GetChannelCount())
+        if (inputBufferSize >= sampleWindowSize*GetChannelCount()) {
+            if (bFirstRun)
+                lastQPCTimestamp += 10;
+            firstTimestamp = GetTimestamp(lastQPCTimestamp);
             break;
+        }
 
         //---------------------------------------------------------
 
@@ -364,9 +388,12 @@ bool MMDeviceAudioSource::GetNextBuffer(void **buffer, UINT *numFrames, QWORD *t
             qpcTimestamp -= UINT64(timeAdjust);
         }
 
-        qpcTimestamp /= 10000;
+        /*if (!bIsMic) {
+            Log(TEXT("f: %u, i: %u, qpc: %llu"), numFramesRead, inputBufferSize != 0, qpcTimestamp);
+        }*/
 
-        firstTimestamp = GetTimestamp(qpcTimestamp);
+        qpcTimestamp /= 10000;
+        lastQPCTimestamp = qpcTimestamp;
 
         //---------------------------------------------------------
 
@@ -379,6 +406,8 @@ bool MMDeviceAudioSource::GetNextBuffer(void **buffer, UINT *numFrames, QWORD *t
         inputBufferSize = newInputBufferSize;
 
         mmCapture->ReleaseBuffer(numFramesRead);
+
+        bFirstRun = false;
     }
 
     *numFrames = sampleWindowSize;
