@@ -1007,7 +1007,7 @@ RTMP_Connect0(RTMP *r, struct sockaddr * service)
         {
             if (bind(r->m_sb.sb_socket, (const struct sockaddr *)&r->m_bindIP.addr, r->m_bindIP.addrLen) < 0)
             {
-                int err = GetSockError();
+                int err = WSAGetLastError();
                 RTMP_Log(RTMP_LOGERROR, "%s, failed to bind socket. %d (%s)",
                          __FUNCTION__, err, strerror(err));
                 RTMP_Close(r);

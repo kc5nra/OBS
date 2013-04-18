@@ -30,6 +30,7 @@ ipch/
 *.zip
 *.lnk
 *.chm
-
+!rundir/plugins/BrowserSourcePlugin/lib/*.dll
+!rundir/plugins/BrowserSourcePlugin/lib/*.exe
 !x264/libs/64bit/*.dll
 !x264/libs/32bit/*.dll
