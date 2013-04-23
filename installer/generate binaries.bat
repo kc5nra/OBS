@@ -19,7 +19,7 @@ mkdir 64bit\plugins\GraphicsCapture
 
 copy ..\release\obs.exe .\32bit\
 copy ..\obsapi\release\obsapi.dll .\32bit\
-copy ..\rundir\OBSHelp.chm .\32bit\
+copy ..\OBSHelp\OBSHelp.chm .\32bit\
 copy ..\rundir\services.xconfig .\32bit\
 copy ..\rundir\pdb32\stripped\*.pdb .\32bit\
 copy ..\rundir\locale\*.txt .\32bit\locale\
@@ -36,7 +36,7 @@ copy ..\x264\libs\32bit\libx264-130.dll .\32bit
 
 copy ..\x64\release\obs.exe .\64bit\
 copy ..\obsapi\x64\release\obsapi.dll .\64bit\
-copy ..\rundir\OBSHelp.chm .\64bit\
+copy ..\OBSHelp\OBSHelp.chm .\64bit\
 copy ..\rundir\services.xconfig .\64bit\
 copy ..\rundir\pdb64\stripped\*.pdb .\64bit\
 copy ..\rundir\locale\*.txt .\64bit\locale\
@@ -64,6 +64,9 @@ mkdir upload\GraphicsCapturePlugin\32bit
 mkdir upload\GraphicsCapturePlugin\32bit\GraphicsCapture
 mkdir upload\GraphicsCapturePlugin\64bit
 mkdir upload\GraphicsCapturePlugin\64bit\GraphicsCapture
+mkdir upload\NoiseGatePlugin
+mkdir upload\NoiseGatePlugin\32bit
+mkdir upload\NoiseGatePlugin\64bit
 mkdir upload\OBS
 mkdir upload\OBS\32bit
 mkdir upload\OBS\64bit
@@ -89,15 +92,18 @@ copy ..\graphicscapture\graphicscapturehook\release\graphicscapturehook.dll .\up
 copy ..\graphicscapture\graphicscapturehook\x64\release\graphicscapturehook64.dll .\upload\GraphicsCapturePlugin\64bit\GraphicsCapture\
 copy ..\injectHelper\release\injectHelper.exe .\upload\GraphicsCapturePlugin\64bit\GraphicsCapture\
 
+copy ..\NoiseGate\release\noisegate.dll .\upload\NoiseGatePlugin\32bit\
+copy ..\NoiseGate\x64\release\noisegate.dll .\upload\NoiseGatePlugin\64bit\
+
 copy ..\release\obs.exe .\upload\OBS\32bit\
 copy ..\obsapi\release\obsapi.dll .\upload\OBS\32bit\
-copy ..\rundir\OBSHelp.chm .\upload\OBS\32bit\
+copy ..\OBSHelp\OBSHelp.chm .\upload\OBS\32bit\
 copy ..\rundir\pdb32\stripped\*.pdb .\upload\OBS\32bit\
 copy ..\x264\libs\32bit\libx264-130.dll .\upload\OBS\32bit
 
 copy ..\x64\release\obs.exe .\upload\OBS\64bit\
 copy ..\obsapi\x64\release\obsapi.dll .\upload\OBS\64bit\
-copy ..\rundir\OBSHelp.chm .\upload\OBS\64bit\
+copy ..\OBSHelp\OBSHelp.chm .\upload\OBS\64bit\
 copy ..\rundir\pdb64\stripped\*.pdb .\upload\OBS\64bit\
 copy ..\x264\libs\64bit\libx264-130.dll .\upload\OBS\64bit
 
