@@ -363,12 +363,16 @@ enum ItemModifyType
     ItemModifyType_Move,
     ItemModifyType_ScaleBottomLeft,
     ItemModifyType_ScaleLeft,
+    ItemModifyType_CropLeft,
     ItemModifyType_ScaleTopLeft,
     ItemModifyType_ScaleTop,
+    ItemModifyType_CropTop,
     ItemModifyType_ScaleTopRight,
     ItemModifyType_ScaleRight,
+    ItemModifyType_CropRight,
     ItemModifyType_ScaleBottomRight,
     ItemModifyType_ScaleBottom,
+    ItemModifyType_CropBottom
 };
 
 //----------------------------

@@ -777,6 +777,20 @@ bool  XConfig::ReadFileData(XElement *curElement, int level, TSTR &lpTemp)
             if(!ReadFileData(curElement, level+1, lpTemp))
                 return false;
         }
+        else if (*lpTemp == '*' && lpTemp[1] == '/') {
+            // found a dangling end comment 
+            return false;
+        }
+        else if (*lpTemp == '/' && lpTemp[1] == '*') {
+            ++lpTemp;
+            // ignore comments
+            while((*++lpTemp != '*' && (*++lpTemp != '/' || !*lpTemp)) || !*lpTemp);
+            if (!*lpTemp) {
+                // found a dangling begin comment
+                return false;
+            }
+            continue;
+        }
         else if(*lpTemp != ' '   &&
                 *lpTemp != L'　' &&
                 *lpTemp != '\t'  &&
@@ -997,33 +1011,6 @@ bool  XConfig::Open(CTSTR lpFile)
 
     TSTR lpFileData = utf8_createTstr(lpFileDataUTF8);
     Free(lpFileDataUTF8);
-
-    //-------------------------------------
-    // remove comments
-
-    TSTR lpComment, lpEndComment;
-
-    while(lpComment = sstr(lpFileData, TEXT("/*")))
-    {
-        lpEndComment = sstr(lpFileData, TEXT("*/"));
-
-        assert(lpEndComment);
-        assert(lpComment < lpEndComment);
-
-        if(!lpEndComment || (lpComment > lpEndComment))
-        {
-            file.Close();
-
-            Close(false);
-            Free(lpFileData);
-
-            CrashError(TEXT("Error parsing X file '%s'"), strFileName.Array());
-        }
-
-        mcpy(lpComment, lpEndComment+3, slen(lpEndComment+3)+1);
-    }
-
-    //-------------------------------------
 
     TSTR lpTemp = lpFileData;
 
